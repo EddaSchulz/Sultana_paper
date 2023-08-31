@@ -1,11 +1,10 @@
 #!/usr/bin/env Rscript
 
-library(readxl) #Part of tidyverse, but needs to be installed separately.(Working on Mac but not my Linux - Check !)
+library(readxl) 
 library(tidyr)
 library(dplyr)
 library(tidyverse)
 library(ggplot2)
-library(Rmisc) # for summarySE function. Was needed to get the mean+-sd ribbon plot
 library(ggpubr) # needed for compare_means
 library(egg) #needed for set_panel_size
 library(knitr) # for making HTML tables using the function kable()
@@ -15,21 +14,15 @@ source("../ValidationPlot_Functions/U_Functions_ValidationExp_Plotting.R")
 
 Mekinh_PD_Doses =c("0","0.4","1.3","4","12","37","111","333","1000")
 
-
 quant_folder= "../../RAW_DATA/ValidationExperiments/MEKi_TC_DR/Analyte_Quant/"
 empiria_folder = "../../RAW_DATA/ValidationExperiments/MEKi_TC_DR/TPS_Quant/"
-
 
 dir.create("./OUTPUT_MekiDR") # Create folder to save all output data
 
 # Create folder OUTPUT_PAPER to save figs used in paper
-if(!(file.exists("./OUTPUT_PAPER"))){ # create only if it does not already exist
+if(!(file.exists("./OUTPUT_PAPER"))){ 
   dir.create("./OUTPUT_PAPER") 
 }
-
-
-
-
 
 ##################################################################
 ####### pMek Normalized over total protein stain   ###############
@@ -143,10 +136,6 @@ PDDR_MekTPS_FC <- FC_Calculation_updated(PDDR_MekTPS)
 
 PDDR_MekTPS_plot <- PDDR_MekTPS_FC %>% 
   select(-c(Exp,Gel )) 
-# select(-c(matches("totalP|TPS"))) %>% 
-# select(-c(matches("Norm_totalP|Norm_TPS")))
-
-
 
 
 ##################################################################
@@ -177,7 +166,6 @@ Gel25_TPS <- read_excel(file.path(empiria_folder,Gel25_TPS_file))
 Gel25_cRafTPS_labeled <- ReadInWBData_TPS(Gel25_samples,Gel25_cRaf, Gel25_TPS, Mekinh_PD_Doses, "Gel25", "cRaf")
 Gel25_cRafTPS_labeled <- Gel25_cRafTPS_labeled %>% 
   filter(Cell_line != "Common")
-
 
 Gel25_cRafTPS_NormOMeanRep <- Norm_o_MeanRep(Gel25_cRafTPS_labeled)
 
@@ -235,11 +223,11 @@ write.csv(PDDR_All_MekTPSplot_FCoXX, file = "./OUTPUT_MekiDR/PDDR_All_MekTPSplot
 
 pMek_max <- PDDR_All_MekTPSplot_FCoXX %>%
   filter(grepl("Mek", Analyte))
-pMek_max <-max(pMek_max$Signal) + 2 # the number is based on how much space i need
+pMek_max <-max(pMek_max$Signal) + 2 # the number is based on how much space is needed
 
 pcRaf_max <- PDDR_All_MekTPSplot_FCoXX %>%
   filter(grepl("Raf", Analyte))
-pcRaf_max <-max(pcRaf_max$Signal) + 0.5 # the number is based on how much space i need
+pcRaf_max <-max(pcRaf_max$Signal) + 0.5 # the number is based on how much space is needed
 
 dummy_Mek <- data.frame(log2Treatment = 0, Signal = pMek_max,
                         Analyte = "FCoXX_M2_Mek", Cell_line = "Common", stringsAsFactors=FALSE)
@@ -248,7 +236,7 @@ dummy_Raf <- data.frame(log2Treatment = 0, Signal = pcRaf_max,
 dummy_data <- rbind(dummy_Mek,dummy_Raf)
 dummy_data$Analyte = factor(dummy_data$Analyte, levels =c("FCoXX_M2_Mek", "FCoXX_M2_cRaf")) # This is to get the correct sequence in the Facet_wrap
 
-#################### ACTUAL PLOTTING ###########
+#################### PLOT ###########
 
 g <- Plot_TwoPanel_ValidationPlot_updated(PDDR_All_MekTPSplot_FCoXX,"log2Treatment","Signal", Analyte_labels,"free_y")+
   geom_blank(data=dummy_data) + 
@@ -259,7 +247,7 @@ g <- Plot_TwoPanel_ValidationPlot_updated(PDDR_All_MekTPSplot_FCoXX,"log2Treatme
 gt=set_panel_size(g,width=unit(2.8,'cm'),height=unit(2.8,'cm'))
 grid.arrange(gt)
 ggsave("PDDR_pMekTPS_pcRaf_FCoXX_MEANline.pdf", gt, dpi=300, useDingbats=FALSE, path = "./OUTPUT_MekiDR")
-ggsave("Fig7F_PDDR_pMekTPS_pcRaf_FCoXX_MEANline.pdf", gt, dpi=300, useDingbats=FALSE, path = "./OUTPUT_PAPER") 
+ggsave("Fig7I_PDDR_pMekTPS_pcRaf_FCoXX_MEANline.pdf", gt, dpi=300, useDingbats=FALSE, path = "./OUTPUT_PAPER") 
 
 
 
@@ -295,11 +283,11 @@ write.csv(PDDR_All_MekTPSplot_FCoCntrl, file = "./OUTPUT_MekiDR/PDDR_All_MekTPSp
 
 pMek_max <- PDDR_All_MekTPSplot_FCoCntrl %>%
   filter(grepl("Mek", Analyte))
-pMek_max <-max(pMek_max$Signal) + 5 # the number is based on how much space i need
+pMek_max <-max(pMek_max$Signal) + 5 # the number is based on how much space is needed
 
 pcRaf_max <- PDDR_All_MekTPSplot_FCoCntrl %>%
   filter(grepl("Raf", Analyte))
-pcRaf_max <-max(pcRaf_max$Signal) + 0.15 # the number is based on how much space i need
+pcRaf_max <-max(pcRaf_max$Signal) + 0.15 # the number is based on how much space is needed
 
 dummy_Mek <- data.frame(log2Treatment = 0, Signal = pMek_max,
                         Analyte = "FCoCntrl_M2_Mek", Cell_line = "Common", stringsAsFactors=FALSE)
@@ -308,7 +296,7 @@ dummy_Raf <- data.frame(log2Treatment = 0, Signal = pcRaf_max,
 dummy_data <- rbind(dummy_Mek,dummy_Raf)
 dummy_data$Analyte = factor(dummy_data$Analyte, levels =c("FCoCntrl_M2_Mek", "FCoCntrl_M2_cRaf")) # This is to get the correct sequence in the Facet_wrap
 
-#################### ACTUAL PLOTTING ###########
+#################### PLOT ###########
 
 g <- Plot_TwoPanel_ValidationPlot_updated(PDDR_All_MekTPSplot_FCoCntrl,"log2Treatment","Signal", Analyte_labels,"free_y")+
   geom_blank(data=dummy_data) + 
@@ -327,8 +315,6 @@ Meki_dose = c(0,0.4,1.3,4,12,37,111,333,1000)
 PDDR_XX_XO_Mek_pvals_FCoCntrl = list()
 for(i in 1:length(Meki_dose)) {
   
-  #Unhash_2_debug
-  #i=3
   
   PDDR_XX_Mek_values <- PDDR_All_MekTPSplot_FCoCntrl %>% 
     ungroup() %>% 
@@ -360,7 +346,7 @@ WriteXLS::WriteXLS(PDDR_Mek_FCoCntrl_Ttest, "./OUTPUT_MekiDR/PDDR_Mek_FCoCntrl_T
 PDDR_XX_XO_cRaf_pvals_FCoCntrl = list()
 for(i in 1:length(Meki_dose) ) {
   
-  #i=2
+
   PDDR_XX_cRaf_values <- PDDR_All_MekTPSplot_FCoCntrl %>% 
     ungroup() %>% 
     select(-c(log2Treatment,Treatment_Fctr)) %>% 
@@ -417,9 +403,6 @@ for(i in 1:length(Meki_dose) ) {
 }
 
 PDDR_Mek_FCoXX_Ttest <- data.frame((sapply(PDDR_XX_XO_Mek_pvals_FCoXX,c)))
-PDDR_Mek_FCoXX_Ttest <- PDDR_Mek_FCoXX_Ttest %>% 
-  mutate(sig = ifelse(p_value<0.05,"*",""))
-WriteXLS::WriteXLS(PDDR_Mek_FCoXX_Ttest, "./OUTPUT_MekiDR/PDDR_Mek_FCoXX_Ttest.xls")
 
 
 PDDR_XX_XO_cRaf_pvals_FCoXX = list()
@@ -447,8 +430,61 @@ for(i in 1:length(Meki_dose) ) {
 }
 
 PDDR_cRaf_FCoXX_Ttest <- data.frame((sapply(PDDR_XX_XO_cRaf_pvals_FCoXX,c)))
+
+
+########## Saving the data for fig 7 F #########
+PDDR_Mek_FCoXX = PDDR_All_MekTPSplot_FCoXX %>% 
+  filter(grepl("Mek", Analyte))
+
+PDDR_Raf_FCoXX = PDDR_All_MekTPSplot_FCoXX %>% 
+  filter(grepl("Raf", Analyte))
+
+
+############ pMek values #######
+PDDR_Mek_FCoXX_Ttest <- PDDR_Mek_FCoXX_Ttest %>% 
+  mutate(sig = ifelse(p_value<0.05,"*","")) %>% 
+  mutate(Treatment=as.numeric(Treatment_value)) %>% 
+  select(-c(Treatment_value))
+
+PDDR_Mek_ReplicateValues  = PDDR_Mek_FCoXX %>% #colnames()
+  select(Cell_line,Replicate,Treatment,log2Treatment,Analyte,Signal) %>% 
+  pivot_wider(names_from = Replicate,values_from=Signal) %>% 
+  rowwise() %>% 
+  mutate(Mean=mean(c(R1,R2,R3), na.rm = TRUE))
+
+Fig7I_MekiDR_Mek_data = left_join(PDDR_Mek_ReplicateValues,PDDR_Mek_FCoXX_Ttest, by="Treatment") 
+Fig7I_MekiDR_Mek_data = Fig7I_MekiDR_Mek_data %>% 
+  mutate(XX_mean = ifelse(Cell_line == "XO", NA, XX_mean)) %>% 
+  mutate(XO_mean = ifelse(Cell_line == "XO", NA, XO_mean)) %>% 
+  mutate(p_value = ifelse(Cell_line == "XO", NA, p_value)) %>% 
+  mutate(sig = ifelse(Cell_line == "XO", NA, sig))
+colnames(Fig7I_MekiDR_Mek_data) = gsub("p_value","p_value(XXvsXO)",colnames(Fig7I_MekiDR_Mek_data))
+
+############ pRaf values #######
 PDDR_cRaf_FCoXX_Ttest <- PDDR_cRaf_FCoXX_Ttest %>% 
-  mutate(sig = ifelse(p_value<0.05,"*",""))
-WriteXLS::WriteXLS(PDDR_cRaf_FCoXX_Ttest, "./OUTPUT_MekiDR/PDDR_cRaf_FCoXX_Ttest.xls")
+  mutate(sig = ifelse(p_value<0.05,"*","")) %>% 
+  mutate(Treatment=as.numeric(Treatment_value)) %>% 
+  select(-c(Treatment_value))
+
+PDDR_Raf_ReplicateValues  = PDDR_Raf_FCoXX %>% #colnames()
+  select(Cell_line,Replicate,Treatment,log2Treatment,Analyte,Signal) %>% 
+  pivot_wider(names_from = Replicate,values_from=Signal) %>% 
+  rowwise() %>% 
+  mutate(Mean=mean(c(R1,R2,R3), na.rm = TRUE))
+
+Fig7I_MekiDR_Raf_data = left_join(PDDR_Raf_ReplicateValues,PDDR_cRaf_FCoXX_Ttest, by="Treatment") 
+Fig7I_MekiDR_Raf_data = Fig7I_MekiDR_Raf_data %>% 
+  mutate(XX_mean = ifelse(Cell_line == "XO", NA, XX_mean)) %>% 
+  mutate(XO_mean = ifelse(Cell_line == "XO", NA, XO_mean)) %>% 
+  mutate(p_value = ifelse(Cell_line == "XO", NA, p_value)) %>% 
+  mutate(sig = ifelse(Cell_line == "XO", NA, sig))
+colnames(Fig7I_MekiDR_Raf_data) = gsub("p_value","p_value(XXvsXO)",colnames(Fig7I_MekiDR_Raf_data))
+
+
+
+Fig7I_MekiDR_All_data = dplyr::bind_rows(Fig7I_MekiDR_Mek_data,Fig7I_MekiDR_Raf_data)
+Fig7I_MekiDR_All_data$Analyte = gsub("FCoXX_M2_", "",Fig7I_MekiDR_All_data$Analyte)
+WriteXLS::WriteXLS(Fig7I_MekiDR_All_data, "./OUTPUT_PAPER/Fig7I_PDDR_All_data.xls")
+
 
 print("Script1 : MekiDR - All steps executed ")

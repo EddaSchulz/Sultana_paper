@@ -1,10 +1,10 @@
 #!/usr/bin/Rscript
 
 library(STASNet)
-library(gdata) #read.xls
-library(openxlsx) # for read.xlsx
+library(gdata) # read.xls
+library(openxlsx) # read.xlsx
 library(plyr) # for ldply
-library(tidyverse) # required for function separate, because that comes from Stringr 
+library(tidyverse) # required for the function separate (package Stringr) 
 
 dir.create("./INPUTS/Exp_Data")
 
@@ -15,19 +15,18 @@ BP_FC_STASNet <- read.xlsx(file.path(BP_Normalized_folder,"Bioplex_FC_STASNet.xl
 WB_Normalized_folder <- "../2B_WB_Norm_FoldChange/OUTPUT"
 WBN2_GelMean_Norm_FC <- read.xlsx(file.path(WB_Normalized_folder,"WBN2_GelMean_Norm_FC_Statsnet.xlsx"))
 
-## Prepping the Bioplex Data and remvoing the AKT readouts for the inconsistent replicates
+## Prepping the Bioplex Data 
 BP_FC_STASNet$Treatment <- gsub(" ","",BP_FC_STASNet$Treatment) # Remove spaces
-BP_FC_STASNet$Treatment <- gsub("c.\\d+","c",BP_FC_STASNet$Treatment) # To remove the .numbers[1:8] that had been addeded to rownames in case of "control" rows using make.names(unique=TRUE) because rownames could not be duplicated.
+BP_FC_STASNet$Treatment <- gsub("c.\\d+","c",BP_FC_STASNet$Treatment) # To remove the .numbers[1:8] that had been addeded to rownames in case of "control" rows. These digist were aded previously by make.names(unique=TRUE) because rownames could not be duplicated.
 BP_FC_STASNet$Treatment <- gsub("^c$","control",BP_FC_STASNet$Treatment)
 
-#Removing XX5 and XO4 Akt readings and replacing with NA
+# Replacing with NA the Akt readouts for XX5 and XO4  because these replicates were inconsistent. 
 BP_FC_STASNet$Akt[BP_FC_STASNet$Replicate == "R5" & BP_FC_STASNet$x_status == "XX"] <- NA
 BP_FC_STASNet$Akt[BP_FC_STASNet$Replicate == "R4" & BP_FC_STASNet$x_status == "XO"] <- NA
 
 ## Prepping the WB Data 
-WBN2_GelMean_Norm_FC$Treatment <- gsub("Bmp4i","Bmp4ri",WBN2_GelMean_Norm_FC$Treatment) #Correcting the names of some inhibitors for consistency
+WBN2_GelMean_Norm_FC$Treatment <- gsub("Bmp4i","Bmp4ri",WBN2_GelMean_Norm_FC$Treatment) #Correcting the names of some inhibitors for consistency 
 WBN2_GelMean_Norm_FC$Treatment <- gsub("Gsk3bi","Gsk3i",WBN2_GelMean_Norm_FC$Treatment) #Correcting the names of some inhibitors for consistency
-# Donot need to do it in BP data at this levels, because for BP data I already do it at the time of MIDAS file creation from lxb data.
 
 WBN2_GelMean_Norm_FC <- WBN2_GelMean_Norm_FC %>% filter(Treatment !="Common") # removing the common samples that had been added for normalization
 colnames(WBN2_GelMean_Norm_FC) <- gsub("_FC","",colnames(WBN2_GelMean_Norm_FC))
